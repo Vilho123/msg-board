@@ -1,24 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import MessageBoard from "./components/MessageBoard";
+import { Typography, Box } from "@mui/material";
+import { nameList } from "./namelist";
 
-function App() {
+
+const App = () => {
+  const [username, setUsername] = useState(null);
+
+  const generateUsername = () => {
+    var finalName = nameList[Math.floor(Math.random() * nameList.length )];
+    setUsername(finalName);
+  };
+
+  useEffect(() => {
+    if (!username) {
+      generateUsername();
+    };
+  }, [username]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.Fragment>
+      <MessageBoard username={username} />
+      <Typography textAlign='center' marginTop='5%'>Nickname</Typography>
+      <Typography textAlign={"center"} variant="h5">{username}</Typography>
+    </React.Fragment>
   );
 }
 
