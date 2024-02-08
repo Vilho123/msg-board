@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, QuerySnapshot, getDoc  } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, QuerySnapshot, getDoc, doc, updateDoc  } from "firebase/firestore";
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -26,22 +26,19 @@ const analytics = getAnalytics(app);
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
 
-// References
-const messagesRef = collection(db, "messages");
-
 export async function addData(nickname, msg) {
   const date = new Date();
   const formattedDate = date.toLocaleDateString('fi-FI');
   const formattedTime = date.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' });
   try {
-    const docRef = await addDoc(messagesRef, {
+    const docRef = await addDoc(collection(db, "messages"), {
       name: nickname.username,
       message: msg,
       date: formattedDate,
       time: formattedTime,
       likes: 0,
       // add id in order to sort messages by the lowest index
-      index: (await getDocs(messagesRef)).size + 1
+      index: (await getDocs(collection(db, "messages"))).size + 1
     });
     console.log("Document written with ID: ", docRef.id);
   } catch(error) {
@@ -51,8 +48,14 @@ export async function addData(nickname, msg) {
 
 export async function updateDocumentLikes(documentId) {
   try {
-    const docRef = await getDoc(messagesRef);
-    console.log(docRef)
+    const docRef = doc(db, "messages", documentId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const foundDoc = docSnap.data();
+      await updateDoc(docRef, {
+        likes: foundDoc.likes + 1
+      });
+    };
   } catch(error) {
     console.error("Error updating document: ", error);
   };
@@ -61,7 +64,7 @@ export async function updateDocumentLikes(documentId) {
 export async function fetchMessages() {
   let messages = [];
   try {
-    const docRef = await getDocs(messagesRef);
+    const docRef = await getDocs(collection(db, "messages"));
     docRef.forEach((doc) => {
 
       messages.push({ id: doc.id, ...doc.data() })

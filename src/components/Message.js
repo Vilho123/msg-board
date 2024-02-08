@@ -2,10 +2,17 @@ import React from 'react';
 import { Card, CardContent, Typography, Box } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { updateDocumentLikes } from '../firebase';
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+
+const theme = createTheme({
+  palette: {
+    ochre: {
+      main: '#E3D026'
+    }
+  }
+});
 
 const Message = ({ message, documentId }) => {
-  const likes = 0;
-
   const handleLike = async (docId) => {
     console.log("Handling like...");
     const result = await updateDocumentLikes(docId);
@@ -13,6 +20,7 @@ const Message = ({ message, documentId }) => {
   };
 
   return (
+    <ThemeProvider theme={theme}>
     <Card style={{ marginBottom: '10px' }}>
       <CardContent>
         <Box display="flex" justifyContent="space-between">
@@ -28,11 +36,12 @@ const Message = ({ message, documentId }) => {
           {message.message}
         </Typography>
         <Box display={"flex"} justifyContent={"flex-start"} alignItems={"center"}>
-          <FavoriteBorderIcon sx={{ ":hover": { cursor: 'pointer', transform: "scale(1.05)" } }} onClick={() => handleLike(documentId)}/>
-          <Typography ml={1} color={"text.secondary"}>{likes}</Typography>
+          <FavoriteBorderIcon sx={{ ":hover": { cursor: 'pointer', transform: "scale(1.05)" } }} onClick={() => handleLike(documentId)} color='ochre'/>
+          <Typography ml={1} color={"text.secondary"}>{message.likes}</Typography>
         </Box>
       </CardContent>
     </Card>
+    </ThemeProvider>
   );
 };
 
