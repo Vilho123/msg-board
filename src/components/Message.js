@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { updateDocumentLikes } from '../firebase';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { deleteDocument, updateDocumentLikes } from '../firebase';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
@@ -39,6 +40,7 @@ const Message = ({ message, documentId, fetchMessages }) => {
         <Box display={"flex"} justifyContent={"flex-start"} alignItems={"center"}>
           <FavoriteBorderIcon sx={{ ":hover": { cursor: 'pointer', transform: "scale(1.05)" } }} onClick={() => handleLike(documentId)} color='ochre'/>
           <Typography ml={1} color={"text.secondary"}>{message.likes}</Typography>
+          <DeleteOutlineIcon sx={{ ":hover": { cursor: 'pointer', transform: "scale(1.05)" }, float: 'right' }} onClick={() => deleteDocument(documentId)} color='ochre'/>
         </Box>
       </CardContent>
     </Card>

@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, QuerySnapshot, getDoc, doc, updateDoc  } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, getDoc, doc, updateDoc, deleteDoc  } from "firebase/firestore";
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -76,5 +76,15 @@ export async function fetchMessages() {
   } catch (error) {
     console.error("Error fetching data", error);
   } 
+};
+
+export async function deleteDocument(documentId) {
+  await deleteDoc(doc(db, "messages", documentId))
+  .then((response) => {
+    console.log("Document deleted", response);
+  })
+  .catch((error) => {
+    console.error("Error deleting document", error);
+  });
 };
 

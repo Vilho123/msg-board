@@ -8,14 +8,21 @@ const MessageBoard = (name) => {
   const [username, setUsername] = useState(null);
   const [savedMessages, setSavedMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const messageBoardRef = useRef(null);
 
   const handleSendMessage = async () => {
-    if (username !== null && newMessage) {
+    if (username !== null && newMessage !== '') {
+      setError(false);
+      setErrorMessage(null);
       setMessages([...messages, { username, text: newMessage }]);
       await addData(username, newMessage);
       setNewMessage('');
       fetchSavedMessages();
+    } else {
+      setError(true);
+      setErrorMessage('Message cannot be empty');
     };
   };
 
@@ -35,16 +42,18 @@ const MessageBoard = (name) => {
     };
   }, [name])
 
+  // If fetchSavedMessages function fires, scroll down automatically
+  // to the most recent message
   useEffect(() => {
-    // Scroll to the bottom when messages are updated
-    if (messageBoardRef.current) {
+    if (fetchSavedMessages) {
       messageBoardRef.current.scrollTop = messageBoardRef.current.scrollHeight;
-    }
-  }, [messages]);
+    };
+  }, [fetchSavedMessages]);
 
   return (
     <Box style={{ marginTop: '10px' }}>
       <Container
+        ref={messageBoardRef}
         maxWidth="sm"
         sx={{
           overflowY: 'auto',
@@ -60,12 +69,22 @@ const MessageBoard = (name) => {
       </Container>
       <Box display="flex" flexDirection="column" alignItems="center" marginTop="10px">
         <TextField
+          helperText={errorMessage}
+          error={error}
           label="Message"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           multiline
           variant="outlined"
           style={{ marginBottom: '10px', }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              if (newMessage !== '') {
+                handleSendMessage();
+              };
+            };
+          }}
         />
         <Button variant="contained" onClick={handleSendMessage}>
           Send
