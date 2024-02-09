@@ -12,11 +12,12 @@ const theme = createTheme({
   }
 });
 
-const Message = ({ message, documentId }) => {
+const Message = ({ message, documentId, fetchMessages }) => {
   const handleLike = async (docId) => {
     console.log("Handling like...");
     const result = await updateDocumentLikes(docId);
     console.log(result);
+    fetchMessages();
   };
 
   return (

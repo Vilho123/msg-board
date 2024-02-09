@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import MessageBoard from "./components/MessageBoard";
-import { Typography, Box } from "@mui/material";
+import { Typography } from "@mui/material";
 import { nameList } from "./namelist";
 
 

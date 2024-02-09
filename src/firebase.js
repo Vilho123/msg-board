@@ -52,7 +52,7 @@ export async function updateDocumentLikes(documentId) {
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       const foundDoc = docSnap.data();
-      await updateDoc(docRef, {
+      updateDoc(docRef, {
         likes: foundDoc.likes + 1
       });
     };
@@ -66,12 +66,11 @@ export async function fetchMessages() {
   try {
     const docRef = await getDocs(collection(db, "messages"));
     docRef.forEach((doc) => {
-
-      messages.push({ id: doc.id, ...doc.data() })
+      messages.push({ id: doc.id, index: doc.index, ...doc.data() })
     });
     // Sort messages array by id
     const sortedMessages = messages.sort(function (a, b) {
-      return a.id - b.id
+      return a.index - b.index
     });
     return sortedMessages;
   } catch (error) {

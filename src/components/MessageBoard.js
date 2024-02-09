@@ -15,6 +15,7 @@ const MessageBoard = (name) => {
       setMessages([...messages, { username, text: newMessage }]);
       await addData(username, newMessage);
       setNewMessage('');
+      fetchSavedMessages();
     };
   };
 
@@ -24,8 +25,6 @@ const MessageBoard = (name) => {
     setSavedMessages(result);
   };
 
-  // Fetch saved messages from database
-  // and set them to savedMessages
   useEffect(() => {
     fetchSavedMessages();
   }, []);
@@ -55,7 +54,7 @@ const MessageBoard = (name) => {
       >
         <Box>
           {savedMessages.map((msg, index) => (
-            <Message key={index} message={msg} documentId={msg.id} />
+            <Message key={index} message={msg} documentId={msg.id} fetchMessages={fetchSavedMessages}/>
           ))}
         </Box>
       </Container>
@@ -66,7 +65,7 @@ const MessageBoard = (name) => {
           onChange={(e) => setNewMessage(e.target.value)}
           multiline
           variant="outlined"
-          style={{ marginBottom: '10px' }}
+          style={{ marginBottom: '10px', }}
         />
         <Button variant="contained" onClick={handleSendMessage}>
           Send
