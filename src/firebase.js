@@ -1,7 +1,8 @@
 // Import the functions you need from the SDKs you need
-import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, getDoc, doc, updateDoc, deleteDoc  } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, arrayUnion, arrayRemove  } from "firebase/firestore";
+import 'firebaseui/dist/firebaseui.css'
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut, updateProfile, } from "firebase/auth"
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -21,43 +22,103 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
+// Initialize Firebase auth
+const auth = getAuth();
 
-export async function addData(nickname, msg) {
+export async function loginUser(object) {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, object.email, object.password);
+    if (userCredential.user) {
+      // Signed in
+      const user = userCredential.user;
+      return user;
+    };
+  } catch (error) {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    return { errorCode, errorMessage }
+  };
+};
+
+export async function createUser(userObject) {
+  try {
+    const docRef = doc(db, "users", "usernames");
+    await createUserWithEmailAndPassword(auth, userObject.email, userObject.password);
+    await updateProfile(auth.currentUser, { displayName: userObject.username });
+    await updateDoc(docRef, {
+      usernames: arrayUnion(userObject.username)
+    });
+
+    // Return the current user if the operations succeed
+    return auth.currentUser;
+  } catch (error) {
+    // Handle errors here
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    
+    // Return an object with error details
+    return { errorCode, errorMessage };
+  }
+}
+
+
+export async function addData(msg) {
   const date = new Date();
   const formattedDate = date.toLocaleDateString('fi-FI');
   const formattedTime = date.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' });
   try {
     const docRef = await addDoc(collection(db, "messages"), {
-      name: nickname.username,
+      userId: auth.currentUser.uid,
+      name: auth.currentUser.displayName,
       message: msg,
       date: formattedDate,
       time: formattedTime,
-      likes: 0,
-      // add id in order to sort messages by the lowest index
+      likes: [],
+      // add index in order to sort messages
       index: (await getDocs(collection(db, "messages"))).size + 1
     });
-    console.log("Document written with ID: ", docRef.id);
   } catch(error) {
     console.error("Error adding document: ", error);
   };
 };
 
-export async function updateDocumentLikes(documentId) {
+export async function handleDocumentLike(documentId) {
   try {
     const docRef = doc(db, "messages", documentId);
     const docSnap = await getDoc(docRef);
+
     if (docSnap.exists()) {
       const foundDoc = docSnap.data();
-      updateDoc(docRef, {
-        likes: foundDoc.likes + 1
-      });
+
+      if (!foundDoc.likes || !foundDoc.likes.includes(auth.currentUser.uid)) {
+        await updateDoc(docRef, {
+          likes: arrayUnion(auth.currentUser.uid)
+        });
+      };
     };
   } catch(error) {
-    console.error("Error updating document: ", error);
+    console.error("Error handling like: ", error);
+  };
+};
+
+export async function handleDocumentDislike(documentId){
+  try {
+    const docRef = doc(db, "messages", documentId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const foundDoc = docSnap.data();
+
+      if (foundDoc.likes.includes(auth.currentUser.uid)) {
+        await updateDoc(docRef, {
+          likes: arrayRemove(auth.currentUser.uid)
+        });
+      }
+    };
+  } catch(error) {
+    console.error("Error handling dislike: ", error);
   };
 };
 
@@ -66,9 +127,8 @@ export async function fetchMessages() {
   try {
     const docRef = await getDocs(collection(db, "messages"));
     docRef.forEach((doc) => {
-      messages.push({ id: doc.id, index: doc.index, ...doc.data() })
+      messages.push({ documentId: doc.id, index: doc.index, ...doc.data() })
     });
-    // Sort messages array by id
     const sortedMessages = messages.sort(function (a, b) {
       return a.index - b.index
     });
@@ -78,13 +138,30 @@ export async function fetchMessages() {
   } 
 };
 
-export async function deleteDocument(documentId) {
-  await deleteDoc(doc(db, "messages", documentId))
-  .then((response) => {
-    console.log("Document deleted", response);
-  })
-  .catch((error) => {
-    console.error("Error deleting document", error);
-  });
+export async function scanUsername(username) {
+  // Check if username already exists
+  const docRef = doc(db, "users", "usernames");
+  const docSnap = await getDoc(docRef);
+  
+  if (docSnap.exists()) {
+    const data = docSnap.data().usernames;
+    let result = "";
+
+    for (let index = 0; index < data.length; index++) {
+      const element = data[index];
+      if (element === username) {
+        result = "Username already exists";
+        break
+      } else {
+        return 0;
+      };
+    };
+    return result;
+  };
 };
+
+export async function deleteDocument(documentId) {
+  await deleteDoc(doc(db, "messages", documentId));
+};
+
 

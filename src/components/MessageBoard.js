@@ -17,7 +17,7 @@ const MessageBoard = (name) => {
       setError(false);
       setErrorMessage(null);
       setMessages([...messages, { username, text: newMessage }]);
-      await addData(username, newMessage);
+      await addData(newMessage);
       setNewMessage('');
       fetchSavedMessages();
     } else {
@@ -26,8 +26,7 @@ const MessageBoard = (name) => {
     };
   };
 
-  const fetchSavedMessages = async () => {
-    console.log("Fetching saved messages...");
+  const fetchSavedMessages = async (message) => {
     const result = await fetchMessages();
     setSavedMessages(result);
   };
@@ -47,7 +46,7 @@ const MessageBoard = (name) => {
   useEffect(() => {
     if (fetchSavedMessages) {
       messageBoardRef.current.scrollTop = messageBoardRef.current.scrollHeight;
-    };
+    }
   }, [fetchSavedMessages]);
 
   return (
@@ -63,7 +62,7 @@ const MessageBoard = (name) => {
       >
         <Box>
           {savedMessages.map((msg, index) => (
-            <Message key={index} message={msg} documentId={msg.id} fetchMessages={fetchSavedMessages}/>
+            <Message key={index} message={msg} documentId={msg.documentId} fetchMessages={fetchSavedMessages} fetchMessagesNoScroll={fetchMessages}/>
           ))}
         </Box>
       </Container>
