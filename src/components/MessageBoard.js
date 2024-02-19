@@ -13,20 +13,15 @@ const MessageBoard = (name) => {
   const messageBoardRef = useRef(null);
 
   const handleSendMessage = async () => {
-    if (username !== null && newMessage !== '') {
-      setError(false);
-      setErrorMessage(null);
-      setMessages([...messages, { username, text: newMessage }]);
-      await addData(newMessage);
-      setNewMessage('');
-      fetchSavedMessages();
-    } else {
-      setError(true);
-      setErrorMessage('Message cannot be empty');
-    };
+    setError(false);
+    setErrorMessage(null);
+    setMessages([...messages, { username, text: newMessage }]);
+    await addData(newMessage);
+    setNewMessage('');
+    fetchSavedMessages();
   };
 
-  const fetchSavedMessages = async (message) => {
+  const fetchSavedMessages = async () => {
     const result = await fetchMessages();
     setSavedMessages(result);
   };
@@ -39,15 +34,7 @@ const MessageBoard = (name) => {
     if (name) {
       setUsername(name);
     };
-  }, [name])
-
-  // If fetchSavedMessages function fires, scroll down automatically
-  // to the most recent message
-  useEffect(() => {
-    if (fetchSavedMessages) {
-      messageBoardRef.current.scrollTop = messageBoardRef.current.scrollHeight;
-    }
-  }, [fetchSavedMessages]);
+  }, [name]);
 
   return (
     <Box style={{ marginTop: '10px' }}>
@@ -62,7 +49,7 @@ const MessageBoard = (name) => {
       >
         <Box>
           {savedMessages.map((msg, index) => (
-            <Message key={index} message={msg} documentId={msg.documentId} fetchMessages={fetchSavedMessages} fetchMessagesNoScroll={fetchMessages}/>
+            <Message key={index} message={msg} documentId={msg.documentId} fetchMessages={fetchSavedMessages}/>
           ))}
         </Box>
       </Container>
@@ -85,7 +72,7 @@ const MessageBoard = (name) => {
             };
           }}
         />
-        <Button variant="contained" onClick={handleSendMessage}>
+        <Button type='submit' variant="contained" onClick={handleSendMessage}>
           Send
         </Button>
         <Typography variant="body2" style={{ marginTop: '10px' }}></Typography>

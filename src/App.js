@@ -3,12 +3,12 @@ import MessageBoard from "./components/MessageBoard";
 import { Typography, Button } from "@mui/material";
 import Popup from './components/Popup/Popup.js';
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { deleteUserData } from "./firebase.js";
 
 
 const App = () => {
   const auth = getAuth();
   const [user, setUser] = useState(null);
-  const [displayName, setDisplayName] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(true);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const App = () => {
       if (user) {
         setUser(user);
       };
-    })
+    });
   }, [user]);
 
   const closePopup = () => {
@@ -25,11 +25,15 @@ const App = () => {
 
   const handleLogout = () => {
     signOut(auth).then(() => {
-      // Sign-out successful.
       setUser(null);
     }).catch((error) => {
-      // An error happened.
-    })
+      console.error(error);
+    });
+  };
+
+  const handleDeleteUser = async () => {
+    await deleteUserData();
+    setUser(null);
   };
 
   return (
@@ -45,6 +49,13 @@ const App = () => {
         marginTop: 5
       }}>
         Logout
+      </Button>
+      <Button onClick={handleDeleteUser} variant="text" sx={{
+        display: 'flex',
+        margin: 'auto',
+        marginTop: 10
+      }}>
+        Delete Account
       </Button>
       </React.Fragment>}
     </React.Fragment>

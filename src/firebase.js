@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, arrayUnion, arrayRemove  } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, arrayUnion, arrayRemove, documentId, deleteField  } from "firebase/firestore";
 import 'firebaseui/dist/firebaseui.css'
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut, updateProfile, } from "firebase/auth"
+import { createUserWithEmailAndPassword, deleteUser, getAuth, signInWithEmailAndPassword, signOut, updateProfile, } from "firebase/auth"
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -60,8 +60,8 @@ export async function createUser(userObject) {
     
     // Return an object with error details
     return { errorCode, errorMessage };
-  }
-}
+  };
+};
 
 
 export async function addData(msg) {
@@ -135,7 +135,7 @@ export async function fetchMessages() {
     return sortedMessages;
   } catch (error) {
     console.error("Error fetching data", error);
-  } 
+  };
 };
 
 export async function scanUsername(username) {
@@ -145,6 +145,10 @@ export async function scanUsername(username) {
   
   if (docSnap.exists()) {
     const data = docSnap.data().usernames;
+    if (!data) {
+      return null;
+    };
+
     let result = "";
 
     for (let index = 0; index < data.length; index++) {
@@ -164,4 +168,39 @@ export async function deleteDocument(documentId) {
   await deleteDoc(doc(db, "messages", documentId));
 };
 
+export async function deleteUserData() {
+  const user = auth.currentUser;
 
+  const messagesRef = await getDocs(collection(db, "messages"));
+  if (messagesRef.size === 0) {
+     console.error("Messages table is empty");  
+  } else {
+    messagesRef.forEach((doc) => {
+      const data = doc.data();
+      if (data.userId === user.uid) {
+        deleteDocument(doc.id);
+      };
+    });
+  };
+
+  const usersRef = doc(db, "users", "usernames");
+  const docSnap = await getDoc(usersRef);
+
+  if (docSnap.exists()) {
+    const usernameData = docSnap.data();
+    usernameData.usernames.forEach((nickname) => {
+      if (nickname === user.displayName) {
+        updateDoc(usersRef, {
+          usernames: deleteField()
+        })
+      } else {
+        return null;
+      };
+    })
+  } else {
+    console.error("Users or usernames table do not exist");;
+  };
+
+  await deleteUser(user);
+  return 0;
+};
