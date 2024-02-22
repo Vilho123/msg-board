@@ -5,7 +5,6 @@ import { addData, fetchMessages } from '../firebase';
 
 
 const MessageBoard = (name) => {
-  const messageSent = Boolean(false);
   const [messages, setMessages] = useState([]);
   const [username, setUsername] = useState(null);
   const [savedMessages, setSavedMessages] = useState([]);

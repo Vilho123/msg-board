@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, arrayUnion, arrayRemove, documentId, deleteField  } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, getDoc, doc, updateDoc, deleteDoc, arrayUnion, arrayRemove, deleteField  } from "firebase/firestore";
 import 'firebaseui/dist/firebaseui.css'
-import { createUserWithEmailAndPassword, deleteUser, getAuth, signInWithEmailAndPassword, signOut, updateProfile, } from "firebase/auth"
+import { createUserWithEmailAndPassword, deleteUser, getAuth, signInWithEmailAndPassword, updateProfile, } from "firebase/auth"
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -199,6 +199,6 @@ export async function deleteUserData() {
     };
   };
 
-  await deleteUser(user);
+  await deleteUser(user)
   return 0;
 };
