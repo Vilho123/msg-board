@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import MessageBoard from "./components/MessageBoard";
-import { Typography, Button } from "@mui/material";
+import { Typography, Button, Snackbar, Alert } from "@mui/material";
 import Popup from './components/Popup/Popup.js';
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { deleteUserData } from "./firebase.js";
@@ -9,12 +9,14 @@ import { deleteUserData } from "./firebase.js";
 const App = () => {
   const auth = getAuth();
   const [user, setUser] = useState(null);
+  const [displayName, setDisplayName] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(true);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
+        handleDisplayName();
       };
     });
   }, [user]);
@@ -26,14 +28,20 @@ const App = () => {
   const handleLogout = () => {
     signOut(auth).then(() => {
       setUser(null);
+      setDisplayName(null);
     }).catch((error) => {
       console.error(error);
     });
   };
 
+  const handleDisplayName = () => {
+    setDisplayName(user.displayName);
+  };
+
   const handleDeleteUser = async () => {
     await deleteUserData();
     setUser(null);
+    setDisplayName(null);
   };
 
   return (
@@ -42,7 +50,7 @@ const App = () => {
       <React.Fragment>
       <MessageBoard name={user.displayName}/>
       <Typography textAlign='center' marginTop='5%'>DisplayName</Typography>
-      <Typography textAlign={"center"} variant="h5">{user.displayName}</Typography>
+      <Typography textAlign={"center"} variant="h5">{displayName}</Typography>
       <Button onClick={handleLogout} variant="outlined" sx={{
         display: 'flex',
         margin: 'auto',

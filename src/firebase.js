@@ -173,7 +173,7 @@ export async function deleteUserData() {
 
   const messagesRef = await getDocs(collection(db, "messages"));
   if (messagesRef.size === 0) {
-     console.error("Messages table is empty");  
+     console.error("Messages table is empty"); 
   } else {
     messagesRef.forEach((doc) => {
       const data = doc.data();
@@ -188,17 +188,15 @@ export async function deleteUserData() {
 
   if (docSnap.exists()) {
     const usernameData = docSnap.data();
-    usernameData.usernames.forEach((nickname) => {
-      if (nickname === user.displayName) {
-        updateDoc(usersRef, {
-          usernames: deleteField()
-        })
-      } else {
-        return null;
-      };
-    })
-  } else {
-    console.error("Users or usernames table do not exist");;
+    if (Object.keys(usernameData).length > 0) {
+      usernameData.usernames.forEach((nickname) => {
+        if (nickname === user.displayName) {
+          updateDoc(usersRef, {
+            usernames: deleteField()
+          });
+        };
+      });
+    };
   };
 
   await deleteUser(user);

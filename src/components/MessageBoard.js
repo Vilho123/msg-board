@@ -3,7 +3,9 @@ import { Container, TextField, Button, Box, Typography } from '@mui/material';
 import Message from './Message';
 import { addData, fetchMessages } from '../firebase';
 
+
 const MessageBoard = (name) => {
+  const messageSent = Boolean(false);
   const [messages, setMessages] = useState([]);
   const [username, setUsername] = useState(null);
   const [savedMessages, setSavedMessages] = useState([]);
@@ -13,12 +15,17 @@ const MessageBoard = (name) => {
   const messageBoardRef = useRef(null);
 
   const handleSendMessage = async () => {
-    setError(false);
-    setErrorMessage(null);
-    setMessages([...messages, { username, text: newMessage }]);
-    await addData(newMessage);
-    setNewMessage('');
-    fetchSavedMessages();
+    if (newMessage !== '') {
+      setError(false);
+      setErrorMessage(null);
+      setMessages([...messages, { username, text: newMessage }]);
+      await addData(newMessage);
+      setNewMessage('');
+
+      fetchSavedMessages();
+    } else {
+      return null;
+    };
   };
 
   const fetchSavedMessages = async () => {

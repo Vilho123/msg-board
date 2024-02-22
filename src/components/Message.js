@@ -1,11 +1,12 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box, Container } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import { deleteDocument, handleDocumentLike, handleDocumentDislike, } from '../firebase';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { getAuth } from 'firebase/auth';
+
 
 const theme = createTheme({
   palette: {
@@ -55,11 +56,11 @@ const Message = ({ message, documentId, fetchMessages }) => {
         </Typography>
         <Container disableGutters sx={{ display: "flex", justifyContent: "space-between" }}>
           {message.userId === auth.currentUser.uid ? <Box display={"flex"}>
-            <ThumbUpIcon color='success' fontSize='small'/> <Typography ml={1} color={"text.secondary"}>{message.likes.length}</Typography>
+            <ThumbUpOffAltIcon color='success' fontSize='small'/> <Typography ml={1} color={"text.secondary"}>{message.likes.length}</Typography>
           </Box> : <Box display={"flex"}>
-          <ThumbUpIcon fontSize='small' sx={{ ":hover": { cursor: 'pointer', transform: "scale(1.05)" } }} onClick={() => handleLike(documentId)} color='ochre'/>
+          <ThumbUpOffAltIcon fontSize='small' sx={{ ":hover": { cursor: 'pointer', transform: "scale(1.05)" } }} onClick={() => handleLike(documentId)} color='ochre'/>
           <Typography ml={1} mr={1} color={"text.secondary"}>{message.likes.length}</Typography>
-          <ThumbDownIcon fontSize='small' sx={{ ":hover": { cursor: 'pointer', transform: "scale(1.05)" } }} onClick={() => handleDislike(documentId)} color='ochre'/>
+          <ThumbDownOffAltIcon fontSize='small' sx={{ ":hover": { cursor: 'pointer', transform: "scale(1.05)" } }} onClick={() => handleDislike(documentId)} color='ochre'/>
         </Box>}
         {message.userId === auth.currentUser.uid ? <Box display={"flex"}>
           <DeleteOutlineIcon sx={{ ":hover": { cursor: 'pointer', transform: "scale(1.05)" }}} onClick={handleDeleteDocument} color='ochre'/>
