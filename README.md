@@ -1,3 +1,5 @@
+Tässä on pieni msg-board projekti josta loppui kiinnostus kesken tehdä loppuun. Hostaan tätä osoitteessa: https://clean-4840d.web.app/ 
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
